@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 const CatFactBlock: React.FC = () => {
@@ -9,19 +9,23 @@ const CatFactBlock: React.FC = () => {
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    useEffect(() => {
+        if (!isLoading && fact) {
+          handleInput();
+        }
+      }, [isLoading, fact]);
+
     const handleInput = () => {
         if (textareaRef.current) {
             const text = textareaRef.current.value;
-            const index = text.indexOf(' ') !== -1 ? text.indexOf(' ') + 1 : text.length;
+            const index = text.indexOf(' ') !== -1 ? text.indexOf(' ') : text.length;
             textareaRef.current.focus();
             textareaRef.current.setSelectionRange(index, index);
-            console.log(index);
         }
     };
 
     const handleClick = () => {
         refetch();
-        handleInput();
     };
 
     return (
