@@ -23,7 +23,7 @@ const AgePredictionBlock: React.FC = () => {
             <button type="submit" disabled={isLoading}>
                 {isLoading ? 'Loading...' : 'Predict Age'}
             </button>
-            {age && <div>Age Prediction: {age.age}</div>}
+            {age && <span className='predict'>Age Prediction: {age.age}</span>}
         </form>
     );
 }

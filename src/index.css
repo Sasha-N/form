@@ -18,7 +18,8 @@ div {
   width: 100%;
 }
 
-button {
+.fact button {
+  margin-top: 80px;
   background-color: aqua;
   width: 20%;
   height: 100px;
@@ -27,7 +28,8 @@ button {
   font-size: 24px;
 }
 
-textarea {
+.fact textarea {
+  margin-top: 80px;
   display: block;
   width: 80%;
   height: 300px;
@@ -36,5 +38,32 @@ textarea {
   overflow-wrap: break-word;
   margin-left: 10px;
   margin-right: 10px;
+  font-size: 24px;
+}
+
+form {
+  width: 100%;
+  margin-top: 80px;
+}
+
+form button {
+  background-color: aqua;
+  width: 20%;
+  padding: 0px;
+  margin-left: 10px;
+  font-size: 24px;
+}
+
+form input {
+  text-align: left;
+  width: 70%;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 24px;
+}
+
+.predict {
+  display: block;
+  margin-top: 50px;
   font-size: 24px;
 }

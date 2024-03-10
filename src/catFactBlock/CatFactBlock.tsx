@@ -29,7 +29,7 @@ const CatFactBlock: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className='fact'>
             <button onClick={handleClick} disabled={isLoading}>
                 {isLoading ? 'Loading...' : 'Get Cat Fact'}
             </button>
