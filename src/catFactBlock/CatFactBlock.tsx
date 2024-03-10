@@ -17,7 +17,7 @@ const CatFactBlock: React.FC = () => {
             <button onClick={handleClick} disabled={isLoading}>
                 {isLoading ? 'Loading...' : 'Get Cat Fact'}
             </button>
-            <input type="text" value={fact?.fact} readOnly />
+            <textarea value={fact?.fact || ''} readOnly />
         </div>
     );
 }
