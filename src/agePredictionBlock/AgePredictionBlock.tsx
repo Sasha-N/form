@@ -25,7 +25,6 @@ const AgePredictionBlock: React.FC = () => {
         refetchOnWindowFocus: false
     });
 
-    let timerId: NodeJS.Timeout;
 
     useEffect(() => {
         if (isFetching && name) {
@@ -40,7 +39,7 @@ const AgePredictionBlock: React.FC = () => {
         setName(event.target.value);
         clearTimeout(timerRef.current!);
         timerRef.current = setTimeout(() => {
-            if (event.target.value.trim() !== '' && event.target.value !== lastSubmittedName) {
+            if (event.target.value.trim() !== '' && event.target.value !== lastSubmittedName && (lastRequestTimeRef.current === null || ((Date.now() - lastRequestTimeRef.current) > 3000))) {
                 setLastSubmittedName(event.target.value);
                 lastRequestTimeRef.current = Date.now();
                 refetch();
@@ -51,9 +50,10 @@ const AgePredictionBlock: React.FC = () => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        clearTimeout(timerId);
-        if (name.trim() !== '' && name !== lastSubmittedName) {
+        clearTimeout(timerRef.current!);
+        if (name.trim() !== '' && name !== lastSubmittedName && (lastRequestTimeRef.current === null || ((Date.now() - lastRequestTimeRef.current) > 3000))) {
             setLastSubmittedName(name);
+            lastRequestTimeRef.current = Date.now();
             refetch();
         }
     };
