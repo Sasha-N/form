@@ -1,30 +1,73 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useRef, useEffect } from 'react';
+import { useQuery, QueryClientProvider, QueryClient } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const AgePredictionBlock: React.FC = () => {
     const [name, setName] = useState('');
-    const { data: age, isLoading, refetch } = useQuery({
+    const nameRef = useRef<string>(name);
+    const [lastSubmittedName, setLastSubmittedName] = useState('');
+    nameRef.current = name;
+
+    const { data: age, isLoading, refetch, isFetching } = useQuery({
         queryKey: ['agePrediction', name],
-        queryFn: async () => fetch(`https://api.agify.io/?name=` + name).then((res) => res.json())
+        queryFn: async () => fetch(`https://api.agify.io/?name=` + nameRef.current)
+            .then((res) => {
+                const data = res.json();
+                if (nameRef.current !== name || nameRef.current === '') {
+                    throw new Error('Request canceled');
+                }
+                return data;
+            }
+            ),
+        enabled: !!name,
+        refetchInterval: false,
+        refetchOnWindowFocus: false
     });
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let timerId: NodeJS.Timeout;
+
+    useEffect(() => {
+        if (isFetching && name) {
+            queryClient.cancelQueries({ queryKey: ['agePrediction'] });
+        }
+    }, [name, isFetching]);
+
+       const timerRef = useRef<NodeJS.Timeout | null>(null);
+       const lastRequestTimeRef = useRef<number | null>(null);
+
+       const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setName(event.target.value);
+        clearTimeout(timerRef.current!);
+        timerRef.current = setTimeout(() => {
+            if (event.target.value.trim() !== '' && event.target.value !== lastSubmittedName) {
+                setLastSubmittedName(event.target.value);
+                lastRequestTimeRef.current = Date.now();
+                refetch();
+            }
+        }, 3000);
     };
+
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        refetch();
+        clearTimeout(timerId);
+        if (name.trim() !== '' && name !== lastSubmittedName) {
+            setLastSubmittedName(name);
+            refetch();
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input type="text" value={name} onChange={handleChange} />
-            <button type="submit" disabled={isLoading}>
-                {isLoading ? 'Loading...' : 'Predict Age'}
-            </button>
-            {age && <span className='predict'>Age Prediction: {age.age}</span>}
-        </form>
+        <QueryClientProvider client={queryClient}>
+            <form onSubmit={handleSubmit}>
+                <input type="text" value={name} onChange={handleChange} />
+                <button type="submit" disabled={isLoading || !name}>
+                    {isLoading ? 'Loading...' : 'Predict Age'}
+                </button>
+                <span className='predict'>Age Prediction: {age && age.age}</span>
+            </form>
+        </QueryClientProvider>
     );
 }
 
